@@ -8,6 +8,16 @@ Cairo's iterator system isn't just syntactic sugar — it's actually more effici
 
 **TL;DR:** Use iterators. They're cleaner code AND cheaper gas.
 
+## Key Findings
+
+✅ **Iterators win for most operations:**
+- `sum`, `filter_sum`, `map_sum`, `fold` — **20-28% cheaper** with iterators
+- `all`, `find`, `take`, `zip` — **11-26% cheaper** with iterators
+
+⚠️ **Exceptions where loops win:**
+- `count` — Use `len()` instead of `iter.count()` (O(1) vs O(n))
+- `enumerate` at scale — Index conversion overhead makes loops faster for large arrays
+
 ## Gas Comparison Results
 
 Run `python3 analyze_gas.py` to regenerate these results:
@@ -122,16 +132,6 @@ Average Gas Costs (across all 30 comparisons):
   Loop:     1,574,783 L2 gas
   Average Savings: +6.6%
 ```
-
-## Key Findings
-
-✅ **Iterators win for most operations:**
-- `sum`, `filter_sum`, `map_sum`, `fold` — **20-28% cheaper** with iterators
-- `all`, `find`, `take`, `zip` — **11-26% cheaper** with iterators
-
-⚠️ **Exceptions where loops win:**
-- `count` — Use `len()` instead of `iter.count()` (O(1) vs O(n))
-- `enumerate` at scale — Index conversion overhead makes loops faster for large arrays
 
 ## What's Inside
 
