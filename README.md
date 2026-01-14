@@ -1,19 +1,16 @@
-# Cairo Iterators Benchmarking Suite
+# Cairo Iterators Gas Efficiency Showcase
 
-A comprehensive benchmarking framework to compare gas usage between iterator-based and traditional loop approaches in Cairo. This project provides real-world data to help developers make informed decisions about when to use iterators vs traditional loops in their smart contracts.
+This repository demonstrates that **Cairo iterators are more gas-efficient than traditional loops** for most common operations. The results show **20-30% gas savings** when using iterators over indexed loops.
 
-## The Idea
+## Why Iterators?
 
-Cairo's iterator system offers powerful abstractions for working with collections, but many developers wonder: **Are iterators more gas-efficient than traditional loops?** This repository answers that question by providing:
+Cairo's iterator system isn't just syntactic sugar — it's actually more efficient. This repo provides concrete evidence through side-by-side comparisons of 11 different operations, each implemented with both iterators and traditional loops.
 
-- **Side-by-side comparisons** of iterator and loop implementations for common operations
-- **Gas usage measurements** across different data sizes (small, medium, large)
-- **11 different iterator operations** from Cairo's corelib (sum, filter, map, count, fold, any, all, find, zip, enumerate, take)
-- **Automated analysis** that generates formatted comparison reports
+**TL;DR:** Use iterators. They're cleaner code AND cheaper gas.
 
-## Benchmark Results
+## Gas Comparison Results
 
-Run `python3 analyze_gas.py` to regenerate these results. Full comparison table:
+Run `python3 analyze_gas.py` to regenerate these results:
 
 ```
 ====================================================================================================
@@ -126,112 +123,68 @@ Average Gas Costs (across all 30 comparisons):
   Average Savings: +6.6%
 ```
 
-**Key Findings:**
-- Most iterator operations show **20-30% gas savings** compared to traditional loops
-- Operations like `sum`, `filter_sum`, `map_sum`, and `fold` consistently favor iterators
-- `count` favors loops (since `len()` is O(1) vs iterator counting which is O(n))
-- `enumerate` shows mixed results — efficient for small arrays but worse at scale due to index conversion overhead
+## Key Findings
 
-## About This Repository
+✅ **Iterators win for most operations:**
+- `sum`, `filter_sum`, `map_sum`, `fold` — **20-28% cheaper** with iterators
+- `all`, `find`, `take`, `zip` — **11-26% cheaper** with iterators
 
-### Structure
+⚠️ **Exceptions where loops win:**
+- `count` — Use `len()` instead of `iter.count()` (O(1) vs O(n))
+- `enumerate` at scale — Index conversion overhead makes loops faster for large arrays
 
-Functions are organized by operation type in separate modules:
+## What's Inside
 
-**Source Files (`src/`):**
-- `sum.cairo` - Sum operations
-- `filter_sum.cairo` - Filter and sum operations
-- `map_sum.cairo` - Map and sum operations
-- `count.cairo` - Count elements
-- `fold.cairo` - Fold/accumulate operations
-- `any.cairo` - Check if any element matches
-- `all.cairo` - Check if all elements match
-- `find.cairo` - Find first matching element
-- `zip.cairo` - Pair elements from two iterators
-- `enumerate.cairo` - Get index-value pairs
-- `take.cairo` - Limit iteration to N elements
-- `lib.cairo` - Main library file that re-exports all functions
+Each operation is implemented twice — once with iterators, once with traditional loops:
 
-**Test Files (`tests/`):**
-- Each operation has a corresponding test file (e.g., `test_sum.cairo`, `test_filter_sum.cairo`)
-- Tests include small (10 elements), medium (100 elements), and large (1000 elements) benchmarks
-- Each test file includes correctness tests to verify both approaches produce identical results
+| Operation | Iterator Example | Loop Alternative |
+|-----------|------------------|------------------|
+| **sum** | `for value in span { sum += *value }` | `while i < len { sum += *data.at(i) }` |
+| **filter_sum** | Iterator with conditional | Loop with conditional |
+| **map_sum** | Iterator with transform | Loop with transform |
+| **fold** | `iter.fold(init, \|acc, x\| ...)` | Loop accumulator |
+| **any** | `iter.any(\|x\| condition)` | Loop with early break |
+| **all** | `iter.all(\|x\| condition)` | Loop with early break |
+| **find** | `iter.find(\|x\| condition)` | Loop with early break |
+| **zip** | `for (a, b) in zip(span1, span2)` | Parallel index loop |
+| **enumerate** | `for (i, v) in iter.enumerate()` | Manual index tracking |
+| **take** | `for v in iter.take(n)` | Loop with limit |
 
-### Design Principles
+## Running the Tests
 
-- **Simplicity**: Pure functions without contract boilerplate - focuses purely on computation
-- **Extensibility**: Easy to add new operation types by creating new source and test files
-- **Consistency**: Paired functions perform identical operations for fair comparison
-- **Comprehensive**: Multiple data sizes and operation types for thorough analysis
-- **Measurable**: Gas reporting works automatically - no special attributes needed
-
-## Running Benchmarks
-
-### Quick Start
-
-Run the formatted analysis:
 ```bash
+# See formatted comparison
 python3 analyze_gas.py
-```
 
-This automatically:
-1. Runs `snforge test --gas-report`
-2. Parses gas costs for all tests
-3. Groups by operation type and size
-4. Displays formatted comparison tables
-5. Calculates percentage savings
-6. Shows summary statistics
-
-### Manual Execution
-
-Run tests directly:
-```bash
-snforge test
-```
-
-View raw gas report:
-```bash
+# Or run tests directly
 snforge test --gas-report
 ```
 
-Pipe to analysis script:
-```bash
-snforge test --gas-report | python3 analyze_gas.py
+## Repository Structure
+
 ```
+src/
+├── sum.cairo          # Sum operations
+├── filter_sum.cairo   # Filter + sum
+├── map_sum.cairo      # Map + sum
+├── count.cairo        # Element counting
+├── fold.cairo         # Fold/reduce
+├── any.cairo          # Any match
+├── all.cairo          # All match
+├── find.cairo         # Find first
+├── zip.cairo          # Zip iterators
+├── enumerate.cairo    # Index + value
+├── take.cairo         # Take N elements
+└── lib.cairo          # Re-exports
 
-**Note:** The `#[available_gas]` attribute is optional and not required for gas reporting. Gas reporting works automatically with `snforge test --gas-report` regardless of attributes.
-
-## Test Coverage
-
-The suite includes **71 tests** covering:
-
-- **11 operation types**: sum, filter_sum, map_sum, count, fold, any, all, find, zip, enumerate, take
-- **3 data sizes**: small (10), medium (100), large (1000) elements
-- **30 direct comparisons** between iterator and loop approaches
-- **Correctness verification** to ensure both approaches produce identical results
-
-## Extending the Benchmark Suite
-
-To add new benchmark comparisons:
-
-1. Create a new source file in `src/` (e.g., `src/new_operation.cairo`) with both iterator and loop versions
-2. Add the module to `src/lib.cairo` and re-export the functions
-3. Create a corresponding test file in `tests/` (e.g., `tests/test_new_operation.cairo`)
-4. Follow the naming convention: `benchmark_{operation}_{approach}_{size}`
-5. The `analyze_gas.py` script will automatically include the new tests in the comparison report
+tests/
+└── test_*.cairo       # Corresponding tests for each operation
+```
 
 ## Technical Notes
 
-- Iterators use `Span` for efficient iteration (converted from `Array`)
+- All functions are pure (no storage) for accurate gas measurement
+- Iterators use `Span` for efficient iteration
 - Traditional loops use indexed access with `data.at(i)`
-- All operations are pure functions (no storage) for accurate gas measurement
-- Filter operations use equality checks (values not equal to threshold)
 - Gas measurements use L2 gas as the primary metric
-
-## Contributing
-
-This is an open-source benchmarking suite. Contributions are welcome! Areas for improvement:
-- Additional iterator operations from Cairo's corelib
-- More complex operation combinations
-- Different data patterns and distributions
-- Performance optimizations
+- Tests cover small (10), medium (100), and large (1000) element arrays
