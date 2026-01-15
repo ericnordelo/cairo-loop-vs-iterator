@@ -1,5 +1,3 @@
-use core::array::ArrayTrait;
-
 /// Filter and sum elements using iterator (sums values not equal to threshold)
 pub fn filter_sum_with_iterator(data: Array<felt252>, threshold: felt252) -> felt252 {
     let mut sum = 0;

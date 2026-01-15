@@ -1,6 +1,3 @@
-use core::array::ArrayTrait;
-use core::iter::IntoIterator;
-
 /// Sum first N elements using iterator take approach
 pub fn take_sum_with_iterator(data: Array<felt252>, n: usize) -> felt252 {
     let mut sum = 0;

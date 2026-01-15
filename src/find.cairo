@@ -1,6 +1,3 @@
-use core::array::ArrayTrait;
-use core::iter::IntoIterator;
-
 /// Find first element matching condition using iterator approach
 pub fn find_with_iterator(data: Array<felt252>, target: felt252) -> Option<felt252> {
     let mut iter = data.into_iter();

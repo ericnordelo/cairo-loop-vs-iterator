@@ -1,6 +1,3 @@
-use core::array::ArrayTrait;
-use core::iter::IntoIterator;
-
 /// Sum elements with their indices using iterator enumerate approach
 pub fn enumerate_sum_with_iterator(data: Array<felt252>) -> felt252 {
     let mut sum = 0;

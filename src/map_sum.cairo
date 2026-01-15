@@ -1,5 +1,3 @@
-use core::array::ArrayTrait;
-
 /// Map and sum elements using iterator
 pub fn map_sum_with_iterator(data: Array<felt252>, multiplier: felt252) -> felt252 {
     let mut sum = 0;

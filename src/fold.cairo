@@ -1,6 +1,3 @@
-use core::array::ArrayTrait;
-use core::iter::IntoIterator;
-
 /// Fold (accumulate) elements using iterator approach
 pub fn fold_with_iterator(data: Array<felt252>, initial: felt252) -> felt252 {
     let span = data.span();

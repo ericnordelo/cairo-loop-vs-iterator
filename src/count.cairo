@@ -1,6 +1,3 @@
-use core::array::ArrayTrait;
-use core::iter::IntoIterator;
-
 /// Count elements using iterator approach
 pub fn count_with_iterator(data: Array<felt252>) -> usize {
     data.into_iter().count()

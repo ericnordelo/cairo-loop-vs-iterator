@@ -1,6 +1,3 @@
-use core::array::ArrayTrait;
-use core::iter::IntoIterator;
-
 /// Sum elements from two arrays using iterator chain approach
 pub fn chain_sum_with_iterator(data1: Array<felt252>, data2: Array<felt252>) -> felt252 {
     let mut sum = 0;

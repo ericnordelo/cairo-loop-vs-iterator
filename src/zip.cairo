@@ -1,4 +1,3 @@
-use core::array::ArrayTrait;
 use core::iter::zip;
 
 /// Sum paired elements from two arrays using iterator zip approach

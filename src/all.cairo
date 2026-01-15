@@ -1,6 +1,3 @@
-use core::array::ArrayTrait;
-use core::iter::IntoIterator;
-
 /// Check if all elements match condition (not equal to threshold) using iterator approach
 pub fn all_with_iterator(data: Array<felt252>, threshold: felt252) -> bool {
     let span = data.span();
