@@ -4,7 +4,7 @@ This repository demonstrates that **Cairo iterators are more gas-efficient than 
 
 ## Why Iterators?
 
-Cairo's iterator system isn't just syntactic sugar — it's actually more efficient. This repo provides concrete evidence through side-by-side comparisons of 11 different operations, each implemented with both iterators and traditional loops.
+Cairo's iterator system isn't just syntactic sugar — it's actually more efficient. This repo provides concrete evidence through side-by-side comparisons of 12 different operations, each implemented with both iterators and traditional loops.
 
 **TL;DR:** Use iterators. They're cleaner code AND cheaper gas.
 
@@ -13,6 +13,7 @@ Cairo's iterator system isn't just syntactic sugar — it's actually more effici
 ✅ **Iterators win for most operations:**
 - `sum`, `filter_sum`, `map_sum`, `fold` — **20-28% cheaper** with iterators
 - `all`, `find`, `take`, `zip` — **11-26% cheaper** with iterators
+- `chain`, `any` — **2-3% cheaper** with iterators
 
 ⚠️ **Exceptions where loops win:**
 - `count` — Use `len()` instead of `iter.count()` (O(1) vs O(n))
@@ -42,6 +43,15 @@ Size         Iterator (L2 Gas)    Loop (L2 Gas)        Difference           Savi
 ----------------------------------------------------------------------------------------------------
 Small        41,100               42,240               +1,140               +2.7%          
 Medium       251,700              252,840              +1,140               +0.5%          
+
+
+CHAIN SUM
+----------------------------------------------------------------------------------------------------
+Size         Iterator (L2 Gas)    Loop (L2 Gas)        Difference           Savings        
+----------------------------------------------------------------------------------------------------
+Small        70,170               71,920               +1,750               +2.4%          
+Medium       1,026,820            1,050,420            +23,600              +2.2%          
+Large        10,089,820           10,320,420           +230,600             +2.2%          
 
 
 COUNT
@@ -127,10 +137,10 @@ Large        6,669,430            8,579,060            +1,909,630           +22.
 SUMMARY
 ====================================================================================================
 
-Average Gas Costs (across all 30 comparisons):
-  Iterator: 1,470,235 L2 gas
-  Loop:     1,574,783 L2 gas
-  Average Savings: +6.6%
+Average Gas Costs (across 27 comparisons, excluding count and enumerate):
+  Iterator: 1,505,199 L2 gas
+  Loop:     1,858,991 L2 gas
+  Average Savings: +19.0%
 ```
 
 ## What's Inside
@@ -149,6 +159,7 @@ Each operation is implemented twice — once with iterators, once with tradition
 | **zip** | `for (a, b) in zip(span1, span2)` | Parallel index loop |
 | **enumerate** | `for (i, v) in iter.enumerate()` | Manual index tracking |
 | **take** | `for v in iter.take(n)` | Loop with limit |
+| **chain** | `for v in iter1.chain(iter2)` | Sequential loops |
 
 ## Running the Tests
 
@@ -175,6 +186,7 @@ src/
 ├── zip.cairo          # Zip iterators
 ├── enumerate.cairo    # Index + value
 ├── take.cairo         # Take N elements
+├── chain.cairo        # Chain iterators
 └── lib.cairo          # Re-exports
 
 tests/

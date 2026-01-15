@@ -7,7 +7,7 @@ pub fn chain_sum_with_iterator(data1: Array<felt252>, data2: Array<felt252>) -> 
     let mut iter1 = data1.into_iter();
     let mut iter2 = data2.into_iter();
     for value in iter1.chain(iter2) {
-        sum += *value;
+        sum += value; // No dereference needed - into_iter() yields owned values
     }
     sum
 }
